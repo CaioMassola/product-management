@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: product-management
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/product_management}
+    username: ${POSTGRES_USER:product_management}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:product_management}
+    password: ${RABBITMQ_PASSWORD:}
+    connection-timeout: 3s
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        concurrency: 2
+        max-concurrency: 2
+        prefetch: 1
+        default-requeue-rejected: false
+        missing-queues-fatal: false
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  mvc:
+    problemdetails:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+app:
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:3000}
+  storage:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_ROOT_USER:}
+    secret-key: ${MINIO_ROOT_PASSWORD:}
+    image-bucket: ${MINIO_IMAGE_BUCKET:product-images}
+    report-bucket: ${MINIO_REPORT_BUCKET:product-reports}
+  reports:
+    messaging-enabled: ${REPORT_MESSAGING_ENABLED:true}
+    scheduling-enabled: ${REPORT_SCHEDULING_ENABLED:true}
