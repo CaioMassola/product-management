@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NextIntlClientProvider } from 'next-intl';
@@ -82,6 +82,41 @@ function mount(children: ReactNode, locale: 'en' | 'pt-BR' = 'en') {
 }
 
 describe('product interface flows', () => {
+  it('debounces changed searches and avoids requests for unchanged trimmed text', async () => {
+    vi.useFakeTimers();
+
+    const fetcher = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(json(page)));
+
+    vi.stubGlobal('fetch', fetcher);
+    const view = mount(<ProductList />);
+    try {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+      expect(fetcher).toHaveBeenCalledTimes(1);
+      const search = screen.getByRole('textbox', { name: 'Search products' });
+      fireEvent.change(search, { target: { value: 'strategy' } });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(349);
+      });
+      expect(fetcher).toHaveBeenCalledTimes(1);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(51);
+      });
+      expect(fetcher).toHaveBeenCalledTimes(2);
+      expect(fetcher.mock.lastCall?.[0]).toContain('search=strategy');
+      fireEvent.change(search, { target: { value: '  strategy  ' } });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+      expect(fetcher).toHaveBeenCalledTimes(2);
+    } finally {
+      view.unmount();
+      vi.useRealTimers();
+    }
+  });
   it('shows saving feedback while a mutation is pending and reports unexpected cancellation', async () => {
     let reject!: (reason: unknown) => void;
     vi.stubGlobal(

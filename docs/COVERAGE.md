@@ -2,7 +2,7 @@
 
 Coverage includes application code, including frontend routes, providers and translation configuration, and backend storage adapters, messaging, seed, controllers and services. Dependencies, generated framework output and test support are not application code. No application file is excluded and there are no coverage-ignore annotations.
 
-Verified on November 14, 2026: 110 frontend tests and 69 backend tests passed, with no skipped tests in the PostgreSQL-enabled run. Frontend statements, branches, functions and lines reached 100%; backend instructions, branches, methods, lines and classes reached 100%. Every configured per-file/per-class check passed.
+Verified on November 14, 2026: 111 frontend tests and 69 backend tests passed, with no skipped tests in the PostgreSQL-enabled run. Frontend statements, branches, functions and lines reached 100%; backend instructions, branches, methods, lines and classes reached 100%. Every configured per-file/per-class check passed.
 
 ## Frontend
 
